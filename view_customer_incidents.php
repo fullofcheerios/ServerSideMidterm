@@ -20,8 +20,8 @@ $q = "SELECT incidents.incidentID AS incidentID,
     technicians WHERE(( technicians.techID = incidents.techID)) AND (customers.customerID = incidents.customerID) ";
 $r = @mysqli_query($dbc, $q); // Run the query.
 
-$q2 = "SELECT customerID FROM customers WHERE (CONCAT(firstName,' ',lastName) = '$id')";
-$r2 =@mysqli_query($dbc, $q2);
+//$q2 = "SELECT customerID FROM customers WHERE (CONCAT(firstName,' ',lastName) = '$row['name']')";
+//$r2 =@mysqli_query($dbc, $q2);
 
 $num = @mysqli_num_rows($r);
 if ($num > 0)
