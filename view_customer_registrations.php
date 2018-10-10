@@ -2,10 +2,11 @@
 // This script gets all the posts for a given user
 // This new version allows the results to be sorted in different ways.
 
-$page_title = 'View Customer Incidents';
+$page_title = 'View Customer Registrations';
 include('includes/header.html');
-echo '<h1>Open Incidents for Customer </h1>';
-$id = $_GET;
+echo '<h1>Open Incidents for Customer #';
+print_r($_GET);
+echo '<h1>';
 
 require('mysqli_connect.php');
 
@@ -19,9 +20,6 @@ $q = "SELECT incidents.incidentID AS incidentID,
 	incidents.productCode AS pc FROM incidents, 
     technicians WHERE(( technicians.techID = incidents.techID)) AND (customers.customerID = incidents.customerID) ";
 $r = @mysqli_query($dbc, $q); // Run the query.
-
-$q2 = "SELECT customerID FROM customers WHERE (CONCAT(firstName,' ',lastName) = '$id')";
-$r2 =@mysqli_query($dbc, $q2);
 
 $num = @mysqli_num_rows($r);
 if ($num > 0)

@@ -1,7 +1,7 @@
 <?php # Script 9.5 - register.php #2
 // This script performs an INSERT query to add a record to the users table.
 
-$page_title = 'Register';
+$page_title = 'Update Your Information';
 include('includes/header.html');
 
 // Check for form submission:
@@ -32,46 +32,50 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		$e = mysqli_real_escape_string($dbc, trim($_POST['email']));
 	}
 	// Check for a username:
-	if (empty($_POST['username'])) {
-		$errors[] = 'You forgot to enter your username.';
+	if (empty($_POST['pnumber'])) {
+		$errors[] = 'You forgot to enter your phone number.';
 	} else {
-		$un = mysqli_real_escape_string($dbc, trim($_POST['username']));
-	}
-
-	// Check for a password and match against the confirmed password:
-	if (!empty($_POST['pass1'])) {
-		if ($_POST['pass1'] != $_POST['pass2']) {
-			$errors[] = 'Your password did not match the confirmed password.';
-		} else {
-			$p = mysqli_real_escape_string($dbc, trim($_POST['pass1']));
-		}
-	} else {
-		$errors[] = 'You forgot to enter your password.';
+		$pn = mysqli_real_escape_string($dbc, trim($_POST['pnumber']));
 	}
 
 	if (empty($errors)) { // If everything's OK.
 
-		// Register the user in the database...
+		// Update the user's information!
 
 		// Make the query:
-		$q = "INSERT INTO users (first_name, last_name, email, pass, username) VALUES ('$fn', '$ln', '$e', SHA2('$p', 512), '$un' )";
+		$q = "SELECT techID FROM technicians WHERE (firstName = '$fn' AND lastName = '$ln')";
 		$r = @mysqli_query($dbc, $q); // Run the query.
-		if ($r) { // If it ran OK.
+		$num = @mysqli_num_rows($r);
+		if($num == 1)
+		{
+			//gets the Tech's ID
+			$row = mysqli_fetch_array($r, MYSQLI_NUM);
+			//UPDATE the Tech's information
+			$q = "UPDATE technicians SET email = '$e' WHERE techID = $row[0]";
+			$r = @mysqli_query($dbc, $q); // Run the query.
+		}
+		if (mysqli_affected_rows($dbc) == 1) { // If it ran OK.
 
-			// Print a message:
-			echo '<h1>Thank you!</h1>
-		<p>You are now registered. In Chapter 12 you will actually be able to log in!</p><p><br></p>';
+				// Print a message.
+				echo '<h1>Thank you!</h1>
+				<p>Your information has been updated.</p><p><br></p>';
 
-		} else { // If it did not run OK.
+			} else { // If it did not run OK.
 
-			// Public message:
-			echo '<h1>System Error</h1>
-			<p class="error">You could not be registered due to a system error. We apologize for any inconvenience.</p>';
+				// Public message:
+				echo '<h1>System Error</h1>
+				<p class="error">Your information could not be changed due to a system error. We apologize for any inconvenience.</p>';
 
-			// Debugging message:
-			echo '<p>' . mysqli_error($dbc) . '<br><br>Query: ' . $q . '</p>';
+				// Debugging message:
+				echo '<p>' . mysqli_error($dbc) . '<br><br>Query: ' . $q . '</p>';
 
-		} // End of if ($r) IF.
+			}
+
+			mysqli_close($dbc); // Close the database connection.
+
+			// Include the footer and quit the script (to not show the form).
+			include('includes/footer.html');
+			exit();// End of if ($r) IF.
 
 		mysqli_close($dbc); // Close the database connection.
 
@@ -94,14 +98,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 } // End of the main Submit conditional.
 ?>
-<h1>Register</h1>
-<form action="register.php" method="post">
+<h1>Update Your Information</h1>
+<form action="update_info.php" method="post">
 	<p>First Name: <input type="text" name="first_name" size="15" maxlength="20" value="<?php if (isset($_POST['first_name'])) echo $_POST['first_name']; ?>"></p>
 	<p>Last Name: <input type="text" name="last_name" size="15" maxlength="40" value="<?php if (isset($_POST['last_name'])) echo $_POST['last_name']; ?>"></p>
 	<p>Email Address: <input type="email" name="email" size="20" maxlength="60" value="<?php if (isset($_POST['email'])) echo $_POST['email']; ?>" > </p>
-	<p>Username: <input type="text" name="username" size="20" maxlength="30" value="<?php if (isset($_POST['username'])) echo $_POST['username']; ?>" > </p>
-	<p>Password: <input type="password" name="pass1" size="10" maxlength="20" value="<?php if (isset($_POST['pass1'])) echo $_POST['pass1']; ?>" ></p>
-	<p>Confirm Password: <input type="password" name="pass2" size="10" maxlength="20" value="<?php if (isset($_POST['pass2'])) echo $_POST['pass2']; ?>" ></p>
-	<p><input type="submit" name="submit" value="Register"></p>
+	<p>Phone Number: <input type="text" name="pnumber" size="20" maxlength="60" value="<?php if (isset($_POST['pnumber'])) echo $_POST['email']; ?>" > </p>
+	<p><input type="submit" name="submit" value="Update"></p>
 </form>
 <?php include('includes/footer.html'); ?>
